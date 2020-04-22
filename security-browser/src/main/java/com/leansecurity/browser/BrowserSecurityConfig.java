@@ -1,5 +1,6 @@
 package com.leansecurity.browser;
 
+import com.leansecurity.browser.authentication.AuthenticationFailure;
 import com.leansecurity.browser.authentication.AuthenticationSuccess;
 import com.leansecurity.core.properties.SecurityCoreProperties;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationSuccess authenticationSuccess;
 
+    @Autowired
+    private AuthenticationFailure authenticationFailure;
     /**
      * 密码加密配置
      * @return
@@ -40,6 +43,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage("/authentication/require")// 跳转到处理登录页面的controller Url
                 .loginProcessingUrl("/authentication/form")// 配置登录表单提交的URL
                 .successHandler(authenticationSuccess)// 设置登录成功处理器使用自己配的
+                .failureHandler(authenticationFailure)// 设置登录失败处理器使用自己配的
                 .and()
                 .authorizeRequests()// 对请求授权
                 .antMatchers("/authentication/require", securityCoreProperties.getBrowser().getLoginPage())
