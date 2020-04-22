@@ -6,14 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="security-app" />
         <module name="security-demo" />
         <module name="security-core" />
+        <module name="security-app" />
         <module name="security-browser" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="security-core" target="1.8" />
       <module name="securitycore" target="1.5" />
     </bytecodeTargetLevel>
   </component>
