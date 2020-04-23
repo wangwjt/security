@@ -46,6 +46,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         ImageValidataCodeFilter validataCodeFilter = new ImageValidataCodeFilter();
         // 为验证码过滤器配置认证失败处理机制
         validataCodeFilter.setAuthenticationFailureHandler(authenticationFailure);
+        // 配置传进去
+        validataCodeFilter.setSecurityCoreProperties(securityCoreProperties);
+        // 调初始化方法
+        validataCodeFilter.afterPropertiesSet();
 
         // 任何请求都需要身份认证
         // 在'用户名密码认证过滤器'前添加'验证码过滤器'
