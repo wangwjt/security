@@ -1,5 +1,6 @@
 package com.leansecurity.browser.authentication;
 
+import com.leansecurity.browser.support.SimpleResponse;
 import com.leansecurity.core.enums.LoginType;
 import com.leansecurity.core.properties.SecurityCoreProperties;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -54,7 +55,7 @@ public class AuthenticationFailure extends SimpleUrlAuthenticationFailureHandler
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setContentType("application/json;charset=UTF-8");
             // 将认证信息写到response里返回
-            response.getWriter().write(objectMapper.writeValueAsString(exception));
+            response.getWriter().write(objectMapper.writeValueAsString(new SimpleResponse(exception.getMessage())));
 
         } else {
             // 如果配置的是跳转，就按跳转返回
