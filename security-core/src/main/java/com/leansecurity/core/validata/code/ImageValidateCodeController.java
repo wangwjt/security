@@ -1,5 +1,7 @@
 package com.leansecurity.core.validata.code;
 
+import com.leansecurity.core.properties.SecurityCoreProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.web.HttpSessionSessionStrategy;
 import org.springframework.social.connect.web.SessionStrategy;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -28,6 +30,10 @@ public class ImageValidateCodeController {
     // session key
     private static final String SESSION_KRY = "IMAGE_CODE";
 
+    @Autowired
+    private SecurityCoreProperties securityCoreProperties;
+
+
     @GetMapping("/code/image")
     public void createImageValidateCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ImageValidataCode imageValidataCode = createImageCode(request);
@@ -44,8 +50,13 @@ public class ImageValidateCodeController {
      * @return
      */
     private ImageValidataCode createImageCode(HttpServletRequest request) {
-        int width = 67;
-        int height = 23;
+        // width和height的值借助ServletRequestUtils从request里取，如果取不到就从配置文件里取
+        int width = ServletRequestUtils.getIntParameter(request,
+                "width",
+                securityCoreProperties.getCode().getImage().getWidth());
+        int height = ServletRequestUtils.getIntParameter(request,
+                "hight",
+                securityCoreProperties.getCode().getImage().getHight());
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
         Graphics g = image.getGraphics();
@@ -65,16 +76,17 @@ public class ImageValidateCodeController {
         }
 
         String sRand = "";
-        for (int i = 0; i < 4; i++) {
+        // 验证码长度相关逻辑；同样借助ServletRequestUtils从request里取，如果取不到就从配置文件里取
+        for (int i = 0; i < ServletRequestUtils.getIntParameter(request,
+                "lenth", securityCoreProperties.getCode().getImage().getLenth()); i++) {
             String rand = String.valueOf(random.nextInt(10));
             sRand += rand;
-            g.setColor(new Color(20 + random.nextInt(110), 20 + random.nextInt(110), 20 + random.nextInt(110)));
+            g.setColor(new Color(20 + random.nextInt(110), 20 +
+                    random.nextInt(110), 20 + random.nextInt(110)));
             g.drawString(rand, 13 * i + 6, 16);
         }
-
         g.dispose();
-
-        return new ImageValidataCode(image, sRand, 60);
+        return new ImageValidataCode(image, sRand, securityCoreProperties.getCode().getImage().getExpireIn());
     }
 
     /**
