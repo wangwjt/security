@@ -12,6 +12,8 @@ public class BrowserProperties {
 
     private LoginType loginType = LoginType.JSON;// 默认按json返回
 
+    private int rememberMeSeconds = 3600;//“记住我”的秒数，默认1小时
+
     public String getLoginPage() {
         return loginPage;
     }
@@ -26,5 +28,13 @@ public class BrowserProperties {
 
     public void setLoginType(LoginType loginType) {
         this.loginType = loginType;
+    }
+
+    public int getRememberMeSeconds() {
+        return rememberMeSeconds;
+    }
+
+    public void setRememberMeSeconds(int rememberMeSeconds) {
+        this.rememberMeSeconds = rememberMeSeconds;
     }
 }

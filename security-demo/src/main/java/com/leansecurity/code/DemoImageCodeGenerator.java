@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author wangjiantao
  * @date 2020/4/24 9:55
  */
-@Component("imageCodeGenerator")
+//@Component("imageCodeGenerator")
 public class DemoImageCodeGenerator implements ValidateCodeGenerator {
     @Override
     public ImageValidataCode createImageCode(HttpServletRequest request) {

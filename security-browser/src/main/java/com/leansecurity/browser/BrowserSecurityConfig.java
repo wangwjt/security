@@ -9,9 +9,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * @author wangjiantao
@@ -30,6 +35,14 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AuthenticationFailure authenticationFailure;
 
+    // 数据源
+    // 数据源的信息是置在置文件里的
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
     /**
      * 密码加密配置
      * @return
@@ -37,6 +50,21 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     *  配置TokenRepository
+     * @return
+     */
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(){
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        // 设置数据源
+        tokenRepository.setDataSource(dataSource);
+        // 创建表
+        tokenRepository.setCreateTableOnStartup(true);// 第一次启动后要注释掉，
+                              // 要不每次运行都创建表，但是DB中已经存在，会报错
+        return tokenRepository;
     }
 
     @Override
@@ -55,10 +83,15 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         // 在'用户名密码认证过滤器'前添加'验证码过滤器'
         http.addFilterBefore(validataCodeFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()// 表单登陆
-                .loginPage("/authentication/require")// 跳转到处理登录页面的controller Url
-                .loginProcessingUrl("/authentication/form")// 配置登录表单提交的URL
-                .successHandler(authenticationSuccess)// 设置登录成功处理器使用自己配的
-                .failureHandler(authenticationFailure)// 设置登录失败处理器使用自己配的
+                    .loginPage("/authentication/require")// 跳转到处理登录页面的controller Url
+                    .loginProcessingUrl("/authentication/form")// 配置登录表单提交的URL
+                    .successHandler(authenticationSuccess)// 设置登录成功处理器使用自己配的
+                    .failureHandler(authenticationFailure)// 设置登录失败处理器使用自己配的
+                .and()
+                    .rememberMe()// “记住我”的相关配置
+                    .tokenRepository(persistentTokenRepository())// 配置tokenRepository
+                    .tokenValiditySeconds(securityCoreProperties.getBrowser().getRememberMeSeconds())//配置过期秒数
+                    .userDetailsService(userDetailsService)// 拿到用户名后用他作登陆
                 .and()
                 .authorizeRequests()// 对请求授权
                 .antMatchers("/authentication/require",
