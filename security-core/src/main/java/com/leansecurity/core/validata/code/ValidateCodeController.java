@@ -22,7 +22,7 @@ import java.util.Random;
  * @date 2020/4/23 9:10
  */
 @RestController
-public class ImageValidateCodeController {
+public class ValidateCodeController {
 
     // 操作session的类
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
