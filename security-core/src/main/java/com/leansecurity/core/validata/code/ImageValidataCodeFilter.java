@@ -106,7 +106,7 @@ public class ImageValidataCodeFilter extends OncePerRequestFilter implements Ini
     }
 
     /**
-     *
+     * 初始化数据，将配置里需要验证码的url提前放进set里
      * @throws ServletException
      */
     @Override
