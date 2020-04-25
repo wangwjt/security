@@ -62,7 +62,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         // 设置数据源
         tokenRepository.setDataSource(dataSource);
         // 创建表
-        tokenRepository.setCreateTableOnStartup(true);// 第一次启动后要注释掉，
+//        tokenRepository.setCreateTableOnStartup(true);// 第一次启动后要注释掉，
                               // 要不每次运行都创建表，但是DB中已经存在，会报错
         return tokenRepository;
     }
@@ -93,10 +93,14 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                     .tokenValiditySeconds(securityCoreProperties.getBrowser().getRememberMeSeconds())//配置过期秒数
                     .userDetailsService(userDetailsService)// 拿到用户名后用他作登陆
                 .and()
+                .sessionManagement()
+                    .invalidSessionUrl("/session/invalid")// session失效后跳转的地址
+                .and()
                 .authorizeRequests()// 对请求授权
                 .antMatchers("/authentication/require",
                         securityCoreProperties.getBrowser().getLoginPage(),
-                        "/code/image")//图形验证码
+                        "/code/image",//图形验证码
+                        "/session/invalid")// session路径
                 .permitAll()// 配置'login.html','配置的登录页面'，'图形验证码'不需要身份认证
                 .anyRequest()// 任何请求
                 .authenticated()//身份认证
